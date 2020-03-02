@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import rospy
 import time
 import os
 import random
@@ -19,8 +19,8 @@ import utils
 
 
 def main(args):
-
-
+    # --------------- init rosnode to enable communication through rostopic ---------------
+    rospy.init_node("image_communiation")
     # --------------- Setup options ---------------
     is_sim = args.is_sim # Run in simulation?
     obj_mesh_dir = os.path.abspath(args.obj_mesh_dir) if is_sim else None # Directory containing 3D mesh files (.obj) of objects to be added to simulation

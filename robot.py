@@ -1,3 +1,13 @@
+"""
+PUBLISHERS:
+color_img, depth_img
++ pub_colorimg (/image_color) - color_img
++ pub_depthimg (/image_depth) - depth_img
+"""
+import rospy
+from sensor_msgs.msg import Image
+import cv2
+from cv_bridge import CvBridge,CvBridgeError
 import socket
 import select
 import struct
@@ -14,7 +24,9 @@ class Robot(object):
 
         self.is_sim = is_sim
         self.workspace_limits = workspace_limits
-
+        self.pub_colorimg = rospy.Publisher("image_color", Image, queue_size = 10,latch=True)
+        self.pub_depthimg = rospy.Publisher("image_depth", Image, queue_size = 10,latch=True)
+        self.bridge = CvBridge()
         # If in simulation...
         if self.is_sim:
 
@@ -133,6 +145,24 @@ class Robot(object):
             self.cam_pose = np.loadtxt('real/camera_pose.txt', delimiter=' ')
             self.cam_depth_scale = np.loadtxt('real/camera_depth_scale.txt', delimiter=' ')
 
+
+    def color_img_callback(self,data):
+        print("subscribe, in color image callback function")
+        try:
+          cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        except CvBridgeError as e:
+          print(e)
+        cv2.imshow("color image", cv_image)
+        cv2.waitKey(3)
+
+    def depth_img_callback(self,data):
+    	print("subscribe, in depth image callback function")
+        try:
+          cv_image = self.bridge.imgmsg_to_cv2(data, "64FC1")
+        except CvBridgeError as e:
+          print(e)
+        cv2.imshow("depth image", cv_image)
+        cv2.waitKey(3)    
 
     def setup_sim_camera(self):
 
@@ -327,6 +357,13 @@ class Robot(object):
             color_img, depth_img = self.camera.get_data()
             # color_img = self.camera.color_data.copy()
             # depth_img = self.camera.depth_data.copy()
+        rospy.sleep(2)
+        self.pub_colorimg.publish(self.bridge.cv2_to_imgmsg(color_img, "rgb8"))
+        self.pub_depthimg.publish(self.bridge.cv2_to_imgmsg(depth_img,"64FC1"))
+        rospy.sleep(2)
+        rospy.Subscriber("image_color", Image, self.color_img_callback)
+        rospy.Subscriber("image_depth", Image, self.depth_img_callback)
+
 
         return color_img, depth_img
 
