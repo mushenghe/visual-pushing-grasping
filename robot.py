@@ -8,6 +8,7 @@ import rospy
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge,CvBridgeError
+from std_msgs.msg import Float32MultiArray
 import socket
 import select
 import struct
@@ -26,6 +27,8 @@ class Robot(object):
         self.workspace_limits = workspace_limits
         self.pub_colorimg = rospy.Publisher("image_color", Image, queue_size = 10,latch=True)
         self.pub_depthimg = rospy.Publisher("image_depth", Image, queue_size = 10,latch=True)
+        self.pub_push = rospy.Publisher("push", Float32MultiArray, queue_size = 10,latch=True)
+        self.pub_grasp = rospy.Publisher("grasp", Float32MultiArray, queue_size = 10,latch=True)
         self.bridge = CvBridge()
         # If in simulation...
         if self.is_sim:
@@ -162,7 +165,18 @@ class Robot(object):
         except CvBridgeError as e:
           print(e)
         cv2.imshow("depth image", cv_image)
-        cv2.waitKey(3)    
+        cv2.waitKey(3)  
+
+    def push_callback(self,data):
+        print("subscribe, in push callback function")
+        push_position_data = data
+        rospy.sleep(0.5)
+
+    def grasp_callback(self,data):
+        print("subscribe, in grasp callback function")
+        grasp_position_data = data
+        rospy.sleep(0.5)
+
 
     def setup_sim_camera(self):
 
@@ -630,7 +644,11 @@ class Robot(object):
     # Primitives ----------------------------------------------------------
 
     def grasp(self, position, heightmap_rotation_angle, workspace_limits):
+        self.pub_grasp.publish({position[0], position[1], position[2]})
         print('Executing: grasp at (%f, %f, %f)' % (position[0], position[1], position[2]))
+        rospy.Subscriber("grasp", Float32MultiArray, self.grasp_callback)
+        
+
 
         if self.is_sim:
 
@@ -807,7 +825,8 @@ class Robot(object):
 
     def push(self, position, heightmap_rotation_angle, workspace_limits):
         print('Executing: push at (%f, %f, %f)' % (position[0], position[1], position[2]))
-
+        self.pub_push.publish({position[0], position[1], position[2]})
+        rospy.Subscriber("push", Float32MultiArray, self.push_callback)
         if self.is_sim:
 
             # Compute tool orientation from heightmap rotation angle
