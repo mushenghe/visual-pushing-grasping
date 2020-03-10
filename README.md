@@ -83,25 +83,25 @@ usage: main.py [-h] [--is_sim] [--obj_mesh_dir OBJ_MESH_DIR]
 
 * Results from the baseline comparisons and ablation studies in the [paper](https://arxiv.org/pdf/1803.09956.pdf) can be reproduced using these flags. For example:
 
-+ Train reactive policies with pushing and grasping (P+G Reactive); specify `--method` to be `'reactive'`, remove `--push_rewards`, remove `--explore_rate_decay`:
+Train reactive policies with pushing and grasping (P+G Reactive); specify `--method` to be `'reactive'`, remove `--push_rewards`, remove `--explore_rate_decay`:
 
     ```shell
     python main.py --is_sim --method 'reactive' --experience_replay --save_visualizations
     ```
 
-+ Train reactive policies with grasping-only (Grasping-only); similar arguments as P+G Reactive above, but add `--grasp_only`:
+Train reactive policies with grasping-only (Grasping-only); similar arguments as P+G Reactive above, but add `--grasp_only`:
 
-    ```shell
+```shell
     python main.py --is_sim --method 'reactive' --experience_replay --grasp_only --save_visualizations
-    ```
+```
 
-+ Train VPG policies without any rewards for pushing (VPG-noreward); similar arguments as regular VPG, but remove `--push_rewards`:
+Train VPG policies without any rewards for pushing (VPG-noreward); similar arguments as regular VPG, but remove `--push_rewards`:
 
-    ```shell
+```shell
     python main.py --is_sim --experience_replay --explore_rate_decay --save_visualizations
-    ```
+```
 
-+ Train shortsighted VPG policies with lower discount factors on future rewards (VPG-myopic); similar arguments as regular VPG, but set `--future_reward_discount` to `0.2`:
+Train shortsighted VPG policies with lower discount factors on future rewards (VPG-myopic); similar arguments as regular VPG, but set `--future_reward_discount` to `0.2`:
 
     ```shell
     python main.py --is_sim --push_rewards --future_reward_discount 0.2 --experience_replay --explore_rate_decay --save_visualizations
@@ -110,7 +110,7 @@ usage: main.py [-h] [--is_sim] [--obj_mesh_dir OBJ_MESH_DIR]
 * To plot the performance of a session over training time, run 
 
 ```shell
-python plot.py 'logs/YOUR-SESSION-DIRECTORY-NAME-HERE'
+    python plot.py 'logs/YOUR-SESSION-DIRECTORY-NAME-HERE'
 ```
 ## Use the pretrained model
 * Checkout this repository and download our pre-trained models
@@ -126,17 +126,16 @@ python plot.py 'logs/YOUR-SESSION-DIRECTORY-NAME-HERE'
   ```
 From the main menu, select File > Open scene..., and open the file grasp_ws/visual-pushing-grasping/simulation/simulation.ttt 
 * In another terminal window, run 
-  ```
+```
 python main.py --is_sim --obj_mesh_dir 'objects/blocks' --num_obj 10 \
     --push_rewards --experience_replay --explore_rate_decay \
     --is_testing --test_preset_cases --test_preset_file 'simulation/test-cases/test-10-obj-07.txt' \
     --load_snapshot --snapshot_file 'downloads/vpg-original-sim-pretrained-10-obj.pth' \
-    --save_visualizations
-  ```
-
-If you run this code by ssh into GPU, remember to disable the visuliazation option or you would get error.
+    --save_visualizations --
+```
 
 <img src="images/vrep.gif" width=100%/>
+
 ## Reference
 
 ```
